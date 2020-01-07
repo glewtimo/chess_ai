@@ -10,7 +10,8 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include "square.hpp"
+/* Forward Declaration */
+class Square;
 
 class Board {
 	private:

@@ -11,32 +11,32 @@
 #include "pieces.hpp"
 
  /** Description: Square constructor */
-Square::Square(Piece* aPiece, int aX, int aY) {
+Square::Square(Piece* aPiece, int aRow, int aCol) {
 	setPiece(aPiece);
-	setX(aX);
-	setY(aY);
+	setRow(aRow);
+	setCol(aCol);
 }
 
 Piece* Square::getPiece() {
 	return piece;
 }
 
-int Square::getX() {
-	return x;
+int Square::getRow() {
+	return row;
 }
 
-int Square::getY() {
-	return y;
+int Square::getCol() {
+	return col;
 }
 
 void Square::setPiece(Piece* aPiece) {
 	piece = aPiece;
 }
 
-void Square::setX(int aX) {
-	x = aX;
+void Square::setRow(int aRow) {
+	row = aRow;
 }
 
-void Square::setY(int aY) {
-	y = aY;
+void Square::setCol(int aCol) {
+	col = aCol;
 }

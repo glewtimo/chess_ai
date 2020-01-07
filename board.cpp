@@ -78,14 +78,16 @@ void Board::resetBoard() {
 	}
 }
 
-Square* Board::getSquare(int aX, int aY) {
-	return grid[aX][aY];
+Square* Board::getSquare(int aRow, int aCol) {
+	return grid[aRow][aCol];
 }
 
 /** Description: Print current state of the board */
 void Board::printBoard() {
+	cout << "    a   b   c   d   e   f   g   h\n";
 	for (int i = 0; i < 8; i++) {
-		cout << "---------------------------------\n";
+		cout << "  ---------------------------------\n";
+		cout << i + 1 << " ";
 		for (int j = 0; j < 8; j++) {
 			cout << "|";
 			if (getSquare(i, j)->getPiece() != nullptr) {
@@ -95,8 +97,10 @@ void Board::printBoard() {
 				cout << "   ";
 			}
 		}
-		cout << "|";
+		cout << "| " << i+1;
 		cout << "\n";
 	}
-	cout << "---------------------------------\n";
+	cout << "  ---------------------------------\n";
+	cout << "    a   b   c   d   e   f   g   h\n";
+
 }

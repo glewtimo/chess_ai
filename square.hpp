@@ -15,17 +15,17 @@
 class Square {
 	private:
 		Piece* piece;
-		int x;
-		int y;
+		int row;
+		int col;
 
 	public:
 		Square(Piece*, int, int);
 		Piece* getPiece();
-		int getX();
-		int getY();
+		int getRow();
+		int getCol();
 		void setPiece(Piece*);
-		void setX(int);
-		void setY(int);
+		void setRow(int);
+		void setCol(int);
 };
 
 

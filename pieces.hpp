@@ -9,30 +9,45 @@
 #ifndef PIECES_HPP
 #define PIECES_HPP
 
-//Forward declarations of Board and Square classes
+/* Forward Declarations */
 class Board;
 class Square;
 
+/**********************************************************************************
+ ************************* SECTION: Piece (Parent Class) **************************
+ **********************************************************************************/
 class Piece {
 	protected:
 		bool white;
 		bool dead;
+		bool king;
 		char symbol;
 
 	public:
 		Piece();
 		bool isWhite();
 		bool isDead();
+		bool isKing();
 		char getSymbol();
 		void setWhite();
 		void setDead();
+		void setKing();
 		void setSymbol(char);
 		virtual bool validMove(Board*, Square*, Square*) = 0;
 };
 
+
+/**********************************************************************************
+ ************************* SECTION: Children of Piece *****************************
+ **********************************************************************************/
 class Pawn : public Piece {
+	private:
+		bool hasMoved;
+
 	public:
 		Pawn();
+		bool isHasMoved();
+		void setHasMoved(bool);
 		bool validMove(Board*, Square*, Square*);
 };
 
