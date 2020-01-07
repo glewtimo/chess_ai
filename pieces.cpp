@@ -209,15 +209,117 @@ Queen::Queen() {
 }
 
 bool Queen::validMove(Board* board, Square* start, Square* end) {
+	int startRow = start->getRow();
+	int startCol = start->getCol();
+	int endRow = end->getRow();
+	int endCol = end->getCol();
+
 	/* Calculate change in row and col of move */
-	int row = abs(start->getRow() - end->getRow());
-	int col = abs(start->getCol() - end->getCol());
+	int row = abs(startRow - endRow);
+	int col = abs(startCol - endCol);
 
 	/* If Queen doesn't move diagonally, vertically or horizontally, return false */
 	if (row != col && row > 0 && col > 0) {
 		return false;
 	}
 
+	/* Make sure queen doesn't hit one of its own pieces or jump
+       over an enemy piece in traveling to its final space */
+
+	//If piece is moving diagonally
+	if (row == col) {
+		int currRow = startRow;
+		int currCol = startCol;
+
+		//If piece is moving up/left
+		if (endRow - startRow < 0 && endCol - startCol < 0) {
+			for (int i = 0; i < row - 1; i++) {
+				currRow--;
+				currCol--;
+				if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+					return false;
+				}
+			}
+		}
+
+		//If piece is moving up/right
+		if (endRow - startRow < 0 && endCol - startCol > 0) {
+			for (int i = 0; i < row - 1; i++) {
+				currRow--;
+				currCol++;
+				if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+					return false;
+				}
+			}
+		}
+
+		//If piece is moving down/left
+		if (endRow - startRow > 0 && endCol - startCol < 0) {
+			for (int i = 0; i < row - 1; i++) {
+				currRow++;
+				currCol--;
+				if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+					return false;
+				}
+			}
+		}
+
+		//If piece is moving down/right
+		if (endRow - startRow > 0 && endCol - startCol > 0) {
+			for (int i = 0; i < row - 1; i++) {
+				currRow++;
+				currCol++;
+				if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+					return false;
+				}
+			}
+		}
+	}
+	//Else piece is moving horizontally or vertically
+	else {
+		//If piece is moving vertically
+		if (row > 0) {
+			//If piece is moving up the board
+			if (startRow - endRow > 0) {
+				for (int i = startRow - 1; i > endRow; i--) {
+					if (board->getSquare(i, startCol)->getPiece() != nullptr) {
+						return false;
+					}
+				}
+			}
+
+			//If piece is moving down the board
+			if (startRow - endRow < 0) {
+				for (int i = startRow + 1; i < endRow; i++) {
+					if (board->getSquare(i, startCol)->getPiece() != nullptr) {
+						return false;
+					}
+				}
+			}
+		}
+
+		//If piece is moving horizontally
+		if (col > 0) {
+			//If piece is moving left
+			if (startCol - endCol > 0) {
+				for (int i = startCol - 1; i > endCol; i--) {
+					if (board->getSquare(startRow, i)->getPiece() != nullptr) {
+						return false;
+					}
+				}
+			}
+
+			//If piece is moving right
+			if (startCol - endCol < 0) {
+				for (int i = startCol + 1; i < endCol; i++) {
+					if (board->getSquare(startRow, i)->getPiece() != nullptr) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+	
 	return true;
 }
 
@@ -325,13 +427,67 @@ Bishop::Bishop() {
 }
 
 bool Bishop::validMove(Board* board, Square* start, Square* end) {
+	int startRow = start->getRow();
+	int startCol = start->getCol();
+	int endRow = end->getRow();
+	int endCol = end->getCol();
+
 	/* Calculate change in row and col of move */
-	int row = abs(start->getRow() - end->getRow());
-	int col = abs(start->getCol() - end->getCol());
+	int row = abs(startRow - endRow);
+	int col = abs(startCol - endCol);
 
 	/* Bishop may only move diagonally */
 	if (row != col) {
 		return false;
+	}
+
+	/* Make sure bishop doesn't hit one of its own pieces or jump
+       over an enemy piece in traveling to its final space */
+	int currRow = startRow;
+	int currCol = startCol;
+
+	//If piece is moving up/left
+	if (endRow - startRow < 0 && endCol - startCol < 0) {
+		for (int i = 0; i < row - 1; i++) {
+			currRow--;
+			currCol--;
+			if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+				return false;
+			}
+		}
+	}
+
+	//If piece is moving up/right
+	if (endRow - startRow < 0 && endCol - startCol > 0) {
+		for (int i = 0; i < row - 1; i++) {
+			currRow--;
+			currCol++;
+			if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+				return false;
+			}
+		}
+	}
+
+	//If piece is moving down/left
+	if (endRow - startRow > 0 && endCol - startCol < 0) {
+		for (int i = 0; i < row - 1; i++) {
+			currRow++;
+			currCol--;
+			if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+				return false;
+			}
+		}
+	}
+
+	//If piece is moving down/right
+	if (endRow - startRow > 0 && endCol - startCol > 0) {
+		for (int i = 0; i < row - 1; i++) {
+			currRow++;
+			currCol++;
+			if (board->getSquare(currRow, currCol)->getPiece() != nullptr) {
+				return false;
+			}
+		}
 	}
 
 	return true;

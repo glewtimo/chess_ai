@@ -85,7 +85,7 @@ bool Game::makeMove(Player* player, Move* move) {
         return false;
     }
 
-    //Check if the move was valid
+    //Check if the move was valid per movement rules of a given piece
     if (!sourcePiece->validMove(board, move->getStart(), move->getEnd())) {
         free(move);
         return false;
