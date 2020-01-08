@@ -16,6 +16,7 @@
 /* Forward Declarations */
 class Player;
 class Board;
+class Square;
 
 /* Game States */
 enum GameState {
@@ -34,6 +35,8 @@ class Game {
         Player* currentTurn;
         Board* board;
         GameState gameState;
+        Square* whiteKing;
+        Square* blackKing;
         std::list <Move*> moves;
 
     public:
@@ -45,6 +48,10 @@ class Game {
         void setGameState(GameState);
         bool playerMove(Player*, int, int, int, int);
         bool makeMove(Player*, Move*);
+        bool isWhiteCheck();
+        bool isBlackCheck();
+        bool isWhiteCheckmate();
+        bool isBlackCheckmate();
 
 };
 

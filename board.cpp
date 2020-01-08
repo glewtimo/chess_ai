@@ -24,8 +24,8 @@ void Board::resetBoard() {
 	grid[0][0] = new Square(new Rook(), 0, 0);
 	grid[0][1] = new Square(new Knight(), 0, 1);
 	grid[0][2] = new Square(new Bishop(), 0, 2);
-	grid[0][3] = new Square(new King(), 0, 3);
-	grid[0][4] = new Square(new Queen(), 0, 4);
+	grid[0][3] = new Square(new Queen(), 0, 3);
+	grid[0][4] = new Square(new King(), 0, 4);
 	grid[0][5] = new Square(new Bishop(), 0, 5);
 	grid[0][6] = new Square(new Knight(), 0, 6);
 	grid[0][7] = new Square(new Rook(), 0, 7);

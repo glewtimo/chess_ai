@@ -23,6 +23,8 @@ Game::Game(Player* p1, Player* p2, Board* aBoard) {
         currentTurn = p2;
     }
     board = aBoard;
+    whiteKing = board->getSquare(7, 4);
+    blackKing = board->getSquare(0, 4);
     gameState = ACTIVE;
 }
 
@@ -91,26 +93,57 @@ bool Game::makeMove(Player* player, Move* move) {
         return false;
     }
 
+    //Move piece from source square to destination square and clear source
+    //square
+    move->getEnd()->setPiece(sourcePiece);
+    move->getStart()->setPiece(nullptr);
+
+    //If move leaves player's own king in check, move pieces back to original 
+    //squares and return false
+    if (player->isWhite()) {
+        if (isWhiteCheck()) {
+            move->getEnd()->setPiece(destPiece);
+            move->getStart()->setPiece(sourcePiece);
+            free(move);
+            return false;
+        }
+    }
+    else {
+        if (isBlackCheck()) {
+            move->getEnd()->setPiece(destPiece);
+            move->getStart()->setPiece(sourcePiece);
+            free(move);
+            return false;
+        }
+    }
+
     //Check if a piece was killed and update
     if (destPiece != nullptr) {
         destPiece->setDead();
         move->setPieceKilled(destPiece);
     }
 
+    //If piece moved is a king update tracker
+    if (sourcePiece->isKing()) {
+        if (player->isWhite()) {
+            whiteKing = move->getEnd();
+        }
+        else {
+            blackKing = move->getEnd();
+        }
+    }
+
     //Add move to list of moves
     moves.push_back(move);
 
-    //Move piece from source square to destination swuare and clear source
-    //square
-    move->getEnd()->setPiece(sourcePiece);
-    move->getStart()->setPiece(nullptr);
-
-    //Check to see if king was captured
-    if (destPiece != nullptr && destPiece->isKing()) {
-        if (player->isWhite()) {
+    //If move puts opponent in checkmate end game
+    if (player->isWhite()) {
+        if (isBlackCheckmate()) {
             setGameState(WHITE_WIN);
         }
-        else {
+    }
+    else {
+        if (isWhiteCheckmate()) {
             setGameState(BLACK_WIN);
         }
     }
@@ -123,5 +156,123 @@ bool Game::makeMove(Player* player, Move* move) {
         currentTurn = player1;
     }
 
+    return true;
+}
+
+/** DESCRIPTION: return true if white king is in check else return false **/
+bool Game::isWhiteCheck() {
+    Square* checkSquare;
+    Piece* checkPiece;
+
+    //check each square to see if the piece is black and can capture white king
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            checkSquare = board->getSquare(i, j);
+            checkPiece = checkSquare->getPiece();
+            //check first that a piece was selected to prevent read access violation on isWhite()
+            if (checkPiece != nullptr) {
+                //check if piece is black
+                if (!checkPiece->isWhite()) {
+                    if (checkPiece->validMove(board, checkSquare, whiteKing)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    //return false if no black pieces can capture white king
+    return false;
+}
+
+/** DESCRIPTION: return true if black king is in check else return false **/
+bool Game::isBlackCheck() {
+    Square* checkSquare;
+    Piece* checkPiece;
+
+    //check each square to see if the piece is white and can capture black king
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            checkSquare = board->getSquare(i, j);
+            checkPiece = checkSquare->getPiece();
+            //check first that a piece was selected to prevent read access violation on isWhite()
+            if (checkPiece != nullptr) {
+                //check if piece is white
+                if (checkPiece->isWhite()) {
+                    if (checkPiece->validMove(board, checkSquare, blackKing)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    //return false if no white pieces can capture black king
+    return false;
+}
+
+/** DESCRIPTION: return true if white is in checkmate else return false **/
+bool Game::isWhiteCheckmate() {
+    Square* checkSquare;
+    Piece* checkPiece;
+
+    //check each square to see if the piece is white and can make a valid move on the next turn
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            checkSquare = board->getSquare(i, j);
+            checkPiece = checkSquare->getPiece();
+            //check first that a piece was selected to prevent read access violation on isWhite()
+            if (checkPiece != nullptr) {
+                //check if piece is white
+                if (checkPiece->isWhite()) {
+                    //if piece was selected and it's white, see if it can make any valid moves
+                    for (int k = 0; k < 8; k++) {
+                        for (int l = 0; l < 8; l++) {
+                            //return false is a valid move is found (player is not in checkmate)
+                            if (checkPiece->validMove(board, checkSquare, board->getSquare(k,l))) {
+                                if (!isWhiteCheck()) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //if no valid moves are found player is in checkmate, return true
+    return true;
+}
+
+/** DESCRIPTION: return true if black is in checkmate else return false **/
+bool Game::isBlackCheckmate() {
+    Square* checkSquare;
+    Piece* checkPiece;
+
+    //check each square to see if the piece is black and can make a valid move on the next turn
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            checkSquare = board->getSquare(i, j);
+            checkPiece = checkSquare->getPiece();
+            //check first that a piece was selected to prevent read access violation on isWhite()
+            if (checkPiece != nullptr) {
+                //check if piece is black
+                if (!checkPiece->isWhite()) {
+                    //if piece was selected and it's black, see if it can make any valid moves
+                    for (int k = 0; k < 8; k++) {
+                        for (int l = 0; l < 8; l++) {
+                            //return false is a valid move is found (player is not in checkmate)
+                            if (checkPiece->validMove(board, checkSquare, board->getSquare(k, l))) {
+                                if (!isBlackCheck()) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //if no valid moves are found player is in checkmate, return true
     return true;
 }

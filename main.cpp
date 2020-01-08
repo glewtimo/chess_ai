@@ -59,4 +59,6 @@ int main() {
 			turn = "White";
 		}
 	}
+
+	cout << "Game over!\n";
 }
