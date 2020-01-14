@@ -11,6 +11,9 @@
 #include "player.hpp"
 #include "board.hpp"
 #include "square.hpp"
+#include <iostream>
+
+using std::cout;
 
 /* Game constructor */
 Game::Game(Player* p1, Player* p2, Board* aBoard) {
@@ -98,12 +101,26 @@ bool Game::makeMove(Player* player, Move* move) {
     move->getEnd()->setPiece(sourcePiece);
     move->getStart()->setPiece(nullptr);
 
+    //If piece moved is a king update tracker
+    if (sourcePiece->isKing()) {
+        if (player->isWhite()) {
+            whiteKing = move->getEnd();
+        }
+        else {
+            blackKing = move->getEnd();
+        }
+    }
+
     //If move leaves player's own king in check, move pieces back to original 
     //squares and return false
     if (player->isWhite()) {
         if (isWhiteCheck()) {
             move->getEnd()->setPiece(destPiece);
             move->getStart()->setPiece(sourcePiece);
+            //If the source piece was the king, reset tracker
+            if (sourcePiece->isKing()) {
+                whiteKing = move->getStart();
+            }
             free(move);
             return false;
         }
@@ -112,6 +129,10 @@ bool Game::makeMove(Player* player, Move* move) {
         if (isBlackCheck()) {
             move->getEnd()->setPiece(destPiece);
             move->getStart()->setPiece(sourcePiece);
+            //If the source piece was the king, reset tracker
+            if (sourcePiece->isKing()) {
+                blackKing = move->getStart();
+            }
             free(move);
             return false;
         }
@@ -123,20 +144,10 @@ bool Game::makeMove(Player* player, Move* move) {
         move->setPieceKilled(destPiece);
     }
 
-    //If piece moved is a king update tracker
-    if (sourcePiece->isKing()) {
-        if (player->isWhite()) {
-            whiteKing = move->getEnd();
-        }
-        else {
-            blackKing = move->getEnd();
-        }
-    }
-
     //Add move to list of moves
     moves.push_back(move);
 
-    //If move puts opponent in checkmate end game
+    //If move puts opponent in checkmate/stalemate update gamestate
     if (player->isWhite()) {
         if (isBlackCheckmate()) {
             setGameState(WHITE_WIN);
@@ -211,25 +222,53 @@ bool Game::isBlackCheck() {
 
 /** DESCRIPTION: return true if white is in checkmate else return false **/
 bool Game::isWhiteCheckmate() {
-    Square* checkSquare;
-    Piece* checkPiece;
+    Square* sourceSquare;
+    Piece* sourcePiece;
+    Square* destSquare;
+    Piece* destPiece;
 
     //check each square to see if the piece is white and can make a valid move on the next turn
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            checkSquare = board->getSquare(i, j);
-            checkPiece = checkSquare->getPiece();
+            sourceSquare = board->getSquare(i, j);
+            sourcePiece = sourceSquare->getPiece();
+
             //check first that a piece was selected to prevent read access violation on isWhite()
-            if (checkPiece != nullptr) {
+            if (sourcePiece != nullptr) {
                 //check if piece is white
-                if (checkPiece->isWhite()) {
+                if (sourcePiece->isWhite()) {
                     //if piece was selected and it's white, see if it can make any valid moves
                     for (int k = 0; k < 8; k++) {
                         for (int l = 0; l < 8; l++) {
-                            //return false is a valid move is found (player is not in checkmate)
-                            if (checkPiece->validMove(board, checkSquare, board->getSquare(k,l))) {
-                                if (!isWhiteCheck()) {
-                                    return false;
+                            destSquare = board->getSquare(k, l);
+                            destPiece = destSquare->getPiece();
+                            //Only proceed if proposed destination square is empty or contains a piece of the opposite color
+                            if (destPiece == nullptr || sourcePiece->isWhite() != destPiece->isWhite()) {
+                                if (sourcePiece->validMove(board, sourceSquare, destSquare)) {
+                                    //If move is valid, move piece and see if king is still in check
+                                    destSquare->setPiece(sourcePiece);
+                                    sourceSquare->setPiece(nullptr);
+                                    //If piece moved was king, update king location
+                                    if (sourcePiece->isKing()) {
+                                        whiteKing = destSquare;
+                                    }
+                                    //If the move takes the king out of check undo the move and return false
+                                    if (!isWhiteCheck()) {
+                                        sourceSquare->setPiece(sourcePiece);
+                                        destSquare->setPiece(destPiece);
+                                        if (sourcePiece->isKing()) {
+                                            whiteKing = sourceSquare;
+                                        }
+                                        return false;
+                                    }
+                                    //If king is still in check, undo the move and continue to next iteration
+                                    else {
+                                        sourceSquare->setPiece(sourcePiece);
+                                        destSquare->setPiece(destPiece);
+                                        if (sourcePiece->isKing()) {
+                                            whiteKing = sourceSquare;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -238,6 +277,8 @@ bool Game::isWhiteCheckmate() {
             }
         }
     }
+
+    //If there are no valid moves, but the king isn't in check, stalemate
 
     //if no valid moves are found player is in checkmate, return true
     return true;
@@ -245,25 +286,53 @@ bool Game::isWhiteCheckmate() {
 
 /** DESCRIPTION: return true if black is in checkmate else return false **/
 bool Game::isBlackCheckmate() {
-    Square* checkSquare;
-    Piece* checkPiece;
+    Square* sourceSquare;
+    Piece* sourcePiece;
+    Square* destSquare;
+    Piece* destPiece;
 
     //check each square to see if the piece is black and can make a valid move on the next turn
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            checkSquare = board->getSquare(i, j);
-            checkPiece = checkSquare->getPiece();
+            sourceSquare = board->getSquare(i, j);
+            sourcePiece = sourceSquare->getPiece();
+
             //check first that a piece was selected to prevent read access violation on isWhite()
-            if (checkPiece != nullptr) {
+            if (sourcePiece != nullptr) {
                 //check if piece is black
-                if (!checkPiece->isWhite()) {
+                if (!sourcePiece->isWhite()) {
                     //if piece was selected and it's black, see if it can make any valid moves
                     for (int k = 0; k < 8; k++) {
                         for (int l = 0; l < 8; l++) {
-                            //return false is a valid move is found (player is not in checkmate)
-                            if (checkPiece->validMove(board, checkSquare, board->getSquare(k, l))) {
-                                if (!isBlackCheck()) {
-                                    return false;
+                            destSquare = board->getSquare(k, l);
+                            destPiece = destSquare->getPiece();
+                            //Only proceed if proposed destination square is empty or contains a piece of the opposite color
+                            if (destPiece == nullptr || sourcePiece->isWhite() != destPiece->isWhite()) {
+                                if (sourcePiece->validMove(board, sourceSquare, destSquare)) {
+                                    //If move is valid, move piece and see if king is still in check
+                                    destSquare->setPiece(sourcePiece);
+                                    sourceSquare->setPiece(nullptr);
+                                    //If piece moved was king, update king location
+                                    if (sourcePiece->isKing()) {
+                                        blackKing = destSquare;
+                                    }
+                                    //If the move takes the king out of check undo the move and return false
+                                    if (!isBlackCheck()) {
+                                        sourceSquare->setPiece(sourcePiece);
+                                        destSquare->setPiece(destPiece);
+                                        if (sourcePiece->isKing()) {
+                                            blackKing = sourceSquare;
+                                        }
+                                        return false;
+                                    }
+                                    //If king is still in check, undo the move and continue to next iteration
+                                    else {
+                                        sourceSquare->setPiece(sourcePiece);
+                                        destSquare->setPiece(destPiece);
+                                        if (sourcePiece->isKing()) {
+                                            blackKing = sourceSquare;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -273,6 +342,25 @@ bool Game::isBlackCheckmate() {
         }
     }
 
+    //If there are no valid moves, but the king isn't in check, stalemate
+
     //if no valid moves are found player is in checkmate, return true
     return true;
+}
+
+
+/** DESCRIPTION: prints gameState to screen **/
+void Game::printGameState() {
+    switch (gameState) {
+    case 0: cout << "Game is active\n";
+        break;
+    case 1: cout << "White player wins!\n";
+        break;
+    case 2: cout << "Black player wins!\n";
+        break;
+    case 3: cout << "The game has been forfeited\n";
+        break;
+    case 4: cout << "Stalemate\n";
+        break;
+    }
 }

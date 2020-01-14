@@ -24,8 +24,7 @@ enum GameState {
     WHITE_WIN,
     BLACK_WIN,
     FORFEIT,
-    STALEMATE,
-    RESIGNATION
+    STALEMATE
 };
 
 class Game {
@@ -52,6 +51,7 @@ class Game {
         bool isBlackCheck();
         bool isWhiteCheckmate();
         bool isBlackCheckmate();
+        void printGameState();
 
 };
 

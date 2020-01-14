@@ -60,5 +60,5 @@ int main() {
 		}
 	}
 
-	cout << "Game over!\n";
+	game->printGameState();
 }
