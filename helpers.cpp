@@ -7,10 +7,16 @@
  *********************************************************************************/
 
 #include "helpers.hpp"
+#include <cstdlib>
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::cin;
 
 /** DESCRIPTION: returns the array index equivalent of a user input chess row */
 int inputRowConverter(int aRow) {
-    return aRow - 1;
+    return abs(aRow - 8);
 }
 
 /** DESCRIPTION: returns the array index equivalent of a user input chess col */

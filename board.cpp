@@ -87,7 +87,7 @@ void Board::printBoard() {
 	cout << "    a   b   c   d   e   f   g   h\n";
 	for (int i = 0; i < 8; i++) {
 		cout << "  ---------------------------------\n";
-		cout << i + 1 << " ";
+		cout << abs(i - 8) << " ";
 		for (int j = 0; j < 8; j++) {
 			cout << "|";
 			if (getSquare(i, j)->getPiece() != nullptr) {
@@ -97,7 +97,7 @@ void Board::printBoard() {
 				cout << "   ";
 			}
 		}
-		cout << "| " << i+1;
+		cout << "| " << abs(i - 8);
 		cout << "\n";
 	}
 	cout << "  ---------------------------------\n";
