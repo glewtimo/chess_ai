@@ -23,6 +23,7 @@ class Player {
         bool isHuman();
         void setWhite(bool);
         void setHuman(bool);
+        virtual void getMove(int&, int&, char&, char&) = 0;
 };
 
 
@@ -32,11 +33,13 @@ class Player {
 class Human: public Player {
     public:
         Human(bool);
+        void getMove(int&, int&, char&, char&);
 };
 
 class Computer: public Player {
     public:
         Computer(bool);
+        void getMove(int&, int&, char&, char&);
 };
 
 #endif

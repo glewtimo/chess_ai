@@ -7,11 +7,15 @@
 #include "helpers.hpp"
 #include <iostream>
 #include <string>
+#include <ctime>
+#include <cstdlib>
 
 using std::cout;
 using std::cin;
 
 int main() {
+	/* Set seed for rand */
+	srand(time(NULL));
 
 	/* Create board, players, and game */
 	Board* board = new Board();
@@ -33,22 +37,17 @@ int main() {
 			game->getBoard()->printBoard();
 			cout << "\nIt is " << turn << "'s turn\n";
 
-			/* Prompt player for move */
-			cout << "Which piece would you like to move (e.g. a (enter) 4)?\n";
-			cin >> startCol;
-			startCol = inputColConverter(startCol);
-			cin >> startRow;
-			startRow = inputRowConverter(startRow);
-			cout << "Where would you like to move it (e.g. b (enter) 6)?\n";
-			cin >> endCol;
-			endCol = inputColConverter(endCol);
-			cin >> endRow;
-			endRow = inputRowConverter(endRow);
+			if (turn == "White") {
+				p1->getMove(startRow, endRow, startCol, endCol);
+			}
+			else {
+				p2->getMove(startRow, endRow, startCol, endCol);
+			}
 			
 			/* playerMove() carries out move and returns true if move was valid */
 			validMove = game->playerMove(game->getCurrentTurn(), startRow, startCol, endRow, endCol);
 			
-			//system("CLS");
+			system("CLS");
 		}
 
 		/* Update turn after successful move */

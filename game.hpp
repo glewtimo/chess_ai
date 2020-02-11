@@ -52,6 +52,7 @@ class Game {
         bool isWhiteCheckmate();
         bool isBlackCheckmate();
         void printGameState();
+        void setCurrentTurn(Player*);
 
 };
 

@@ -56,6 +56,10 @@ void Game::setGameState(GameState aGameState) {
     gameState = aGameState;
 }
 
+void Game::setCurrentTurn(Player* aPlayer) {
+    currentTurn = aPlayer;
+}
+
 /** DESCRIPTION: creates a proposed move by a player and carries it out/returns
  **              true if the move is valid, else deletes the move and returns 
  **              false through call to makeMove*/
@@ -256,12 +260,7 @@ bool Game::isWhiteCheckmate() {
                                             whiteKing = sourceSquare;
                                         }
 
-
-                                        cout << i << "," << j << " to " << k << "," << l << "\n"; //FIXME delete
-
-
                                         return false;
-
                                     }
                                     //If king is still in check, undo the move and continue to next iteration
                                     else {
@@ -331,12 +330,6 @@ bool Game::isBlackCheckmate() {
                                         if (sourcePiece->isKing()) {
                                             blackKing = sourceSquare;
                                         }
-
-
-
-                                        cout << i << "," << j << " to " << k << "," << l << "\n"; //FIXME delete
-
-
 
                                         return false;
                                     }
