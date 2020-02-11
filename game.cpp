@@ -147,16 +147,12 @@ bool Game::makeMove(Player* player, Move* move) {
     //Add move to list of moves
     moves.push_back(move);
 
-    //If move puts opponent in checkmate/stalemate update gamestate
+    //Check if move creates checkmate or stalemate
     if (player->isWhite()) {
-        if (isBlackCheckmate()) {
-            setGameState(WHITE_WIN);
-        }
+        isBlackCheckmate();
     }
     else {
-        if (isWhiteCheckmate()) {
-            setGameState(BLACK_WIN);
-        }
+        isWhiteCheckmate();
     }
 
     //Set turn to the other player
@@ -259,7 +255,13 @@ bool Game::isWhiteCheckmate() {
                                         if (sourcePiece->isKing()) {
                                             whiteKing = sourceSquare;
                                         }
+
+
+                                        cout << i << "," << j << " to " << k << "," << l << "\n"; //FIXME delete
+
+
                                         return false;
+
                                     }
                                     //If king is still in check, undo the move and continue to next iteration
                                     else {
@@ -278,7 +280,13 @@ bool Game::isWhiteCheckmate() {
         }
     }
 
-    //If there are no valid moves, but the king isn't in check, stalemate
+    //If there are no valid moves, but the king isn't in check, stalemate, else Black wins
+    if (!isWhiteCheck()) {
+        setGameState(STALEMATE);
+    }
+    else {
+        setGameState(BLACK_WIN);
+    }
 
     //if no valid moves are found player is in checkmate, return true
     return true;
@@ -323,6 +331,13 @@ bool Game::isBlackCheckmate() {
                                         if (sourcePiece->isKing()) {
                                             blackKing = sourceSquare;
                                         }
+
+
+
+                                        cout << i << "," << j << " to " << k << "," << l << "\n"; //FIXME delete
+
+
+
                                         return false;
                                     }
                                     //If king is still in check, undo the move and continue to next iteration
@@ -342,7 +357,13 @@ bool Game::isBlackCheckmate() {
         }
     }
 
-    //If there are no valid moves, but the king isn't in check, stalemate
+    //If there are no valid moves, but the king isn't in check, stalemate, else Black wins
+    if (!isBlackCheck()) {
+        setGameState(STALEMATE);
+    }
+    else {
+        setGameState(WHITE_WIN);
+    }
 
     //if no valid moves are found player is in checkmate, return true
     return true;

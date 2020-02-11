@@ -48,7 +48,7 @@ int main() {
 			/* playerMove() carries out move and returns true if move was valid */
 			validMove = game->playerMove(game->getCurrentTurn(), startRow, startCol, endRow, endCol);
 			
-			system("CLS");
+			//system("CLS");
 		}
 
 		/* Update turn after successful move */

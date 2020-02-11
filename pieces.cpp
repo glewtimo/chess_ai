@@ -108,9 +108,9 @@ bool Pawn::validMove(Board* board, Square* start, Square* end) {
 	int col = start->getCol() - end->getCol();
 
 	/* If piece is black, flip row so a positive row still indicates forward
-	   movement of the piece */
+	   movement of the piece and negative indicates backwards */
 	if (!pawn->isWhite()) {
-		row = abs(row);
+		row = row * -1;
 	}
 
 	/* If piece does not move forward move is not valid */
