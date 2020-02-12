@@ -22,9 +22,11 @@ class Piece {
 		bool dead;
 		bool king;
 		char symbol;
+		int row;
+		int col;
 
 	public:
-		Piece();
+		Piece(int, int);
 		bool isWhite();
 		bool isDead();
 		bool isKing();
@@ -34,6 +36,10 @@ class Piece {
 		void setKing();
 		void setSymbol(char);
 		virtual bool validMove(Board*, Square*, Square*) = 0;
+		int getRow();
+		int getCol();
+		void setRow(int);
+		void setCol(int);
 };
 
 
@@ -45,7 +51,7 @@ class Pawn : public Piece {
 		bool hasMoved;
 
 	public:
-		Pawn();
+		Pawn(int, int);
 		bool isHasMoved();
 		void setHasMoved(bool);
 		bool validMove(Board*, Square*, Square*);
@@ -53,31 +59,31 @@ class Pawn : public Piece {
 
 class King : public Piece {
 	public:
-		King();
+		King(int, int);
 		bool validMove(Board*, Square*, Square*);
 };
 
 class Queen : public Piece {
 	public:
-		Queen();
+		Queen(int, int);
 		bool validMove(Board*, Square*, Square*);
 };
 
 class Rook : public Piece {
 	public:
-		Rook();
+		Rook(int, int);
 		bool validMove(Board*, Square*, Square*);
 };
 
 class Knight : public Piece {
 	public:
-		Knight();
+		Knight(int, int);
 		bool validMove(Board*, Square*, Square*);
 };
 
 class Bishop : public Piece {
 	public:
-		Bishop();
+		Bishop(int, int);
 		bool validMove(Board*, Square*, Square*);
 };
 

@@ -10,6 +10,8 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+class Board;
+
  /**********************************************************************************
   ************************* SECTION: Player (Parent Class) *************************
   **********************************************************************************/
@@ -23,7 +25,7 @@ class Player {
         bool isHuman();
         void setWhite(bool);
         void setHuman(bool);
-        virtual void getMove(int&, int&, char&, char&) = 0;
+        virtual void getMove(int&, int&, char&, char&, Board*) = 0;
 };
 
 
@@ -33,13 +35,13 @@ class Player {
 class Human: public Player {
     public:
         Human(bool);
-        void getMove(int&, int&, char&, char&);
+        void getMove(int&, int&, char&, char&, Board*);
 };
 
 class Computer: public Player {
     public:
         Computer(bool);
-        void getMove(int&, int&, char&, char&);
+        void getMove(int&, int&, char&, char&, Board*);
 };
 
 #endif

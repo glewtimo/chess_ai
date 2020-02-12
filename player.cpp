@@ -9,6 +9,8 @@
 
 #include "player.hpp"
 #include "helpers.hpp"
+#include "board.hpp"
+#include "pieces.hpp"
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -46,7 +48,7 @@ Human::Human(bool isWhite) {
     setHuman(true);
 }
 
-void Human::getMove(int& startRow, int& endRow, char& startCol, char& endCol) {
+void Human::getMove(int& startRow, int& endRow, char& startCol, char& endCol, Board* board) {
     cout << "Which piece would you like to move (e.g. a (enter) 4)?\n";
     cin >> startCol;
     startCol = inputColConverter(startCol);
@@ -64,16 +66,24 @@ Computer::Computer(bool isWhite) {
     setHuman(false);
 }
 
-void Computer::getMove(int& startRow, int& endRow, char& startCol, char& endCol) {
-    /* Generate random move input*/
-    startRow = rand() % 8 + 1;
-    endRow = rand() % 8 + 1;
-    startCol = rand() % 8 + 97;
-    endCol = rand() % 8 + 97;
+void Computer::getMove(int& startRow, int& endRow, char& startCol, char& endCol, Board* board) {
+    /* Pick a random black piece that is alive */
+    bool foundPiece = false;
+    int randNum;
+    Piece* randPiece = NULL;
+    while (!foundPiece) {
+        randNum = rand() % 16;
+        randPiece = board->getBlackPiece(randNum);
+        if (!randPiece->isDead()) {
+            foundPiece = true;
+        }
+    }
+    
+    /* Get pieces starting location */
+    startRow = randPiece->getRow();
+    startCol = randPiece->getCol();
 
-    /* Convert input as if it was human entered */
-    startCol = inputColConverter(startCol);
-    startRow = inputRowConverter(startRow);
-    endCol = inputColConverter(endCol);
-    endRow = inputRowConverter(endRow);
+    /* Pick a random ending location */
+    endRow = rand() % 8;
+    endCol = rand() % 8;
 }

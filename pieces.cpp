@@ -18,10 +18,12 @@
  **********************************************************************************************/
 
 /** Description: Piece (parent class) constructor */
-Piece::Piece() {
+Piece::Piece(int aRow, int aCol) {
 	white = false;
 	dead = false;
 	king = false;
+	setRow(aRow);
+	setCol(aCol);
 }
 
 /** Description: return true if piece is white, else return false */
@@ -80,13 +82,28 @@ void Piece::setSymbol(char aChar) {
 	symbol = aChar;
 }
 
+int Piece::getRow() {
+	return row;
+}
+
+int Piece::getCol() {
+	return col;
+}
+
+void Piece::setRow(int aRow) {
+	row = aRow;
+}
+
+void Piece::setCol(int aCol) {
+	col = aCol;
+}
 
 /**********************************************************************************************
  ********************************* SECTION: Children of Piece *********************************
  **********************************************************************************************/
 
 /******************************************* Pawn *********************************************/
-Pawn::Pawn() {
+Pawn::Pawn(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('p');
 	setHasMoved(false);
 }
@@ -184,7 +201,7 @@ bool Pawn::validMove(Board* board, Square* start, Square* end) {
 
 
 /******************************************* King *********************************************/
-King::King() {
+King::King(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('k');
 	setKing();
 }
@@ -204,7 +221,7 @@ bool King::validMove(Board* board, Square* start, Square* end) {
 
 
 /******************************************* Queen ********************************************/
-Queen::Queen() {
+Queen::Queen(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('q');
 }
 
@@ -325,7 +342,7 @@ bool Queen::validMove(Board* board, Square* start, Square* end) {
 
 
 /******************************************* Rook *********************************************/
-Rook::Rook() {
+Rook::Rook(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('r');
 }
 
@@ -393,7 +410,7 @@ bool Rook::validMove(Board* board, Square* start, Square* end) {
 
 
 /****************************************** Knight *********************************************/
-Knight::Knight() {
+Knight::Knight(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('n');
 }
 
@@ -422,7 +439,7 @@ bool Knight::validMove(Board* board, Square* start, Square* end) {
 
 
 /****************************************** Bishop ********************************************/
-Bishop::Bishop() {
+Bishop::Bishop(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('b');
 }
 

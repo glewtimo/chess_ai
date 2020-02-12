@@ -148,6 +148,10 @@ bool Game::makeMove(Player* player, Move* move) {
         move->setPieceKilled(destPiece);
     }
 
+    //Update array that tracks each piece of each color
+    sourcePiece->setRow(move->getEnd()->getRow());
+    sourcePiece->setCol(move->getEnd()->getCol());
+
     //Add move to list of moves
     moves.push_back(move);
 

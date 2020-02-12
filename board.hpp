@@ -12,16 +12,21 @@
 
 /* Forward Declaration */
 class Square;
+class Piece;
 
 class Board {
 	private:
 		Square* grid[8][8];
+		Piece* whitePieces[16];
+		Piece* blackPieces[16];
 
 	public:
 		Board();
 		void resetBoard();
 		Square* getSquare(int, int);
 		void printBoard();
+		Piece* getWhitePiece(int);
+		Piece* getBlackPiece(int);
 };
 
 

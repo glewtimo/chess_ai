@@ -38,10 +38,10 @@ int main() {
 			cout << "\nIt is " << turn << "'s turn\n";
 
 			if (turn == "White") {
-				p1->getMove(startRow, endRow, startCol, endCol);
+				p1->getMove(startRow, endRow, startCol, endCol, game->getBoard());
 			}
 			else {
-				p2->getMove(startRow, endRow, startCol, endCol);
+				p2->getMove(startRow, endRow, startCol, endCol, game->getBoard());
 			}
 			
 			/* playerMove() carries out move and returns true if move was valid */
