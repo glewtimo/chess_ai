@@ -22,6 +22,7 @@ Piece::Piece(int aRow, int aCol) {
 	white = false;
 	dead = false;
 	king = false;
+	pawn = false;
 	setRow(aRow);
 	setCol(aCol);
 }
@@ -56,9 +57,31 @@ bool Piece::isKing() {
 	}
 }
 
+/** Description: return true if piece is a pawn, else return false */
+bool Piece::isPawn() {
+	if (pawn) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 /** Description: return the piece's symbol to print to board */
 char Piece::getSymbol() {
 	return symbol;
+}
+
+int Piece::getRow() {
+	return row;
+}
+
+int Piece::getCol() {
+	return col;
+}
+
+int Piece::getValue() {
+	return value;
 }
 
 /** Description: set a piece to white (false by default) and change its
@@ -73,21 +96,23 @@ void Piece::setDead() {
 	dead = true;
 }
 
+/** Description: set a piece to alive (false by default) */
+void Piece::setAlive() {
+	dead = false;
+}
+
 /** Description: set a piece to be a king (false by default) */
 void Piece::setKing() {
 	king = true;
 }
 
+/** Description: set a piece to be a pawn (false by default) */
+void Piece::setPawn() {
+	pawn = true;
+}
+
 void Piece::setSymbol(char aChar) {
 	symbol = aChar;
-}
-
-int Piece::getRow() {
-	return row;
-}
-
-int Piece::getCol() {
-	return col;
 }
 
 void Piece::setRow(int aRow) {
@@ -98,6 +123,14 @@ void Piece::setCol(int aCol) {
 	col = aCol;
 }
 
+void Piece::setValue(int aVal) {
+	value = aVal;
+}
+
+void Piece::invertValue() {
+	value = value * -1;
+}
+
 /**********************************************************************************************
  ********************************* SECTION: Children of Piece *********************************
  **********************************************************************************************/
@@ -106,6 +139,8 @@ void Piece::setCol(int aCol) {
 Pawn::Pawn(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('p');
 	setHasMoved(false);
+	setPawn();
+	setValue(10);
 }
 
 void Pawn::setHasMoved(bool aHasMoved) {
@@ -186,24 +221,50 @@ bool Pawn::validMove(Board* board, Square* start, Square* end) {
 			return false;
 		}
 		else {
-			//Move was pawns 1st and spaces were empty, set hasMoved to true and return true
-			pawn->setHasMoved(true);
+			//Move was pawns 1st and spaces were empty, return true
 			return true;
 		}
 	}
 
-	/* If pawn's first move, update hasMoved before returning true */
-	if (!pawn->isHasMoved()) {
-		pawn->setHasMoved(true);
-	}
 	return true;
 }
 
+void Pawn::getPossibleMoves(int* rowArr, int* colArr, int& numMoves) {
+	numMoves = 0;
+
+	//Add potential ending move spaces without considering other pieces on board
+	if (row < 7) {
+		//add fwd 1
+		rowArr[numMoves] = row + 1;
+		colArr[numMoves] = col;
+		numMoves++;
+		if (col != 0) {
+			//add diag left
+			rowArr[numMoves] = row + 1;
+			colArr[numMoves] = col - 1;
+			numMoves++;
+		}
+		if (col != 7) {
+			//add diag right
+			rowArr[numMoves] = row + 1;
+			colArr[numMoves] = col + 1;
+			numMoves++;
+		}
+		if (row < 6) {
+			//add fwd 2
+			rowArr[numMoves] = row + 2;
+			colArr[numMoves] = col;
+			numMoves++;
+		}
+	}
+
+}
 
 /******************************************* King *********************************************/
 King::King(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('k');
 	setKing();
+	setValue(900);
 }
 
 bool King::validMove(Board* board, Square* start, Square* end) {
@@ -219,10 +280,14 @@ bool King::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void King::getPossibleMoves(int* rowArr, int* colArr, int& numMoves) {
+
+}
 
 /******************************************* Queen ********************************************/
 Queen::Queen(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('q');
+	setValue(90);
 }
 
 bool Queen::validMove(Board* board, Square* start, Square* end) {
@@ -340,10 +405,14 @@ bool Queen::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void Queen::getPossibleMoves(int* rowArr, int* colArr, int& numMoves) {
+
+}
 
 /******************************************* Rook *********************************************/
 Rook::Rook(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('r');
+	setValue(50);
 }
 
 bool Rook::validMove(Board* board, Square* start, Square* end) {
@@ -408,10 +477,14 @@ bool Rook::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void Rook::getPossibleMoves(int* rowArr, int* colArr, int& numMoves) {
+
+}
 
 /****************************************** Knight *********************************************/
 Knight::Knight(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('n');
+	setValue(30);
 }
 
 bool Knight::validMove(Board* board, Square* start, Square* end) {
@@ -437,10 +510,14 @@ bool Knight::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void Knight::getPossibleMoves(int* rowArr, int* colArr, int& numMoves) {
+
+}
 
 /****************************************** Bishop ********************************************/
 Bishop::Bishop(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('b');
+	setValue(30);
 }
 
 bool Bishop::validMove(Board* board, Square* start, Square* end) {
@@ -508,4 +585,8 @@ bool Bishop::validMove(Board* board, Square* start, Square* end) {
 	}
 
 	return true;
+}
+
+void Bishop::getPossibleMoves(int* rowArr, int* colArr, int& numMoves) {
+
 }

@@ -79,11 +79,13 @@ void Board::resetBoard() {
 		}
 	}
 
-	//Put white pieces into tracker array
+	//Put white pieces into tracker array and invert their values so
+	//black pieces have positive value and white have negative
 	for (int i = 0; i < 16; i++) {
-		row = i / 8 + 7;
+		row = i / 8 + 6;
 		col = i % 8;
 		whitePieces[i] = grid[row][col]->getPiece();
+		whitePieces[i]->invertValue();
 	}
 
 	//Set remaining spaces to null
@@ -129,4 +131,20 @@ Piece* Board::getWhitePiece(int pos) {
 /** Takes an int and returns the black piece at that position in the piece array */
 Piece* Board::getBlackPiece(int pos) {
 	return blackPieces[pos];
+}
+
+/** Calculates the value of the board, positive is good for black and negative good for white */
+int Board::calcBoardValue() {
+	int value = 0;
+	Piece* piece = NULL;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			piece = grid[i][j]->getPiece();
+			if (piece != NULL && !piece->isDead()) {
+				value += piece->getValue();
+			}
+		}
+	}
+
+	return value;
 }

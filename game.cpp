@@ -152,6 +152,15 @@ bool Game::makeMove(Player* player, Move* move) {
     sourcePiece->setRow(move->getEnd()->getRow());
     sourcePiece->setCol(move->getEnd()->getCol());
 
+    //If piece moved was a pawn
+    if (sourcePiece->isPawn()) {
+        Pawn* pawn = dynamic_cast<Pawn*>(sourcePiece);
+        //If pawn's first move, update
+        if (!pawn->isHasMoved()) {
+            pawn->setHasMoved(true);
+        }
+    }
+
     //Add move to list of moves
     moves.push_back(move);
 
@@ -381,4 +390,9 @@ void Game::printGameState() {
     case 4: cout << "Stalemate\n";
         break;
     }
+}
+
+
+void Game::setBlackKing(Square* aSquare) {
+    blackKing = aSquare;
 }

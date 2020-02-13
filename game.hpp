@@ -53,6 +53,7 @@ class Game {
         bool isBlackCheckmate();
         void printGameState();
         void setCurrentTurn(Player*);
+        void setBlackKing(Square*);
 
 };
 

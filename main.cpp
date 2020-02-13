@@ -23,6 +23,9 @@ int main() {
 	Player* p2 = new Computer(false);
 	Game* game = new Game(p1, p2, board);
 
+
+	board->calcBoardValue();
+
 	/* Declare variables to be used while carrying out a turn*/
 	bool validMove;
 	int startRow, endRow;
@@ -38,10 +41,10 @@ int main() {
 			cout << "\nIt is " << turn << "'s turn\n";
 
 			if (turn == "White") {
-				p1->getMove(startRow, endRow, startCol, endCol, game->getBoard());
+				p1->getMove(startRow, endRow, startCol, endCol, game->getBoard(), game);
 			}
 			else {
-				p2->getMove(startRow, endRow, startCol, endCol, game->getBoard());
+				p2->getMove(startRow, endRow, startCol, endCol, game->getBoard(), game);
 			}
 			
 			/* playerMove() carries out move and returns true if move was valid */

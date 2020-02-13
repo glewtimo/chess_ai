@@ -27,6 +27,7 @@ class Board {
 		void printBoard();
 		Piece* getWhitePiece(int);
 		Piece* getBlackPiece(int);
+		int calcBoardValue();
 };
 
 
