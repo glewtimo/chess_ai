@@ -48,7 +48,7 @@ class Piece {
 		int getValue();
 		char getSymbol();
 		virtual bool validMove(Board*, Square*, Square*) = 0;
-		virtual void getPossibleMoves(int*, int*, int&) = 0;
+		virtual void getPossibleMoves(int*, int*, int&, Board*) = 0;
 
 };
 
@@ -65,42 +65,42 @@ class Pawn : public Piece {
 		bool isHasMoved();
 		void setHasMoved(bool);
 		bool validMove(Board*, Square*, Square*);
-		void getPossibleMoves(int*, int*, int&);
+		void getPossibleMoves(int*, int*, int&, Board*);
 };
 
 class King : public Piece {
 	public:
 		King(int, int);
 		bool validMove(Board*, Square*, Square*);
-		void getPossibleMoves(int*, int*, int&);
+		void getPossibleMoves(int*, int*, int&, Board*);
 };
 
 class Queen : public Piece {
 	public:
 		Queen(int, int);
 		bool validMove(Board*, Square*, Square*);
-		void getPossibleMoves(int*, int*, int&);
+		void getPossibleMoves(int*, int*, int&, Board*);
 };
 
 class Rook : public Piece {
 	public:
 		Rook(int, int);
 		bool validMove(Board*, Square*, Square*);
-		void getPossibleMoves(int*, int*, int&);
+		void getPossibleMoves(int*, int*, int&, Board*);
 };
 
 class Knight : public Piece {
 	public:
 		Knight(int, int);
 		bool validMove(Board*, Square*, Square*);
-		void getPossibleMoves(int*, int*, int&);
+		void getPossibleMoves(int*, int*, int&, Board*);
 };
 
 class Bishop : public Piece {
 	public:
 		Bishop(int, int);
 		bool validMove(Board*, Square*, Square*);
-		void getPossibleMoves(int*, int*, int&);
+		void getPossibleMoves(int*, int*, int&, Board*);
 };
 
 

@@ -79,14 +79,14 @@ void Computer::getMove(int& startRow, int& endRow, char& startCol, char& endCol,
     int maxValue = -300000; //Track board values
     int currValue; //Track value of a single move
     /* Check max board state produced by moving each piece */
-    //FIXME: right now only selecting pawns
-    for (int i = 8; i < 16; i++) {
+    for (int i = 0; i < 16; i++) {
         //Select piece
         sourcePiece = board->getBlackPiece(i);
+
         //If it is not dead
         if (!sourcePiece->isDead()) {
             //Grab all potential moves
-            sourcePiece->getPossibleMoves(rows, cols, numMoves);
+            sourcePiece->getPossibleMoves(rows, cols, numMoves, board);
             //Check if each move is valid, calc score of board
             for (int j = 0; j < numMoves; j++) {
                 sourceSquare = board->getSquare(sourcePiece->getRow(), sourcePiece->getCol());
