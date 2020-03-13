@@ -8,11 +8,7 @@
 
 #include "helpers.hpp"
 #include <cstdlib>
-#include <iostream>
-#include <string>
 
-using std::cout;
-using std::cin;
 
 /** DESCRIPTION: returns the array index equivalent of a user input chess row */
 int inputRowConverter(int aRow) {

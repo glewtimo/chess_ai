@@ -18,10 +18,13 @@
  **********************************************************************************************/
 
 /** Description: Piece (parent class) constructor */
-Piece::Piece() {
+Piece::Piece(int aRow, int aCol) {
 	white = false;
 	dead = false;
 	king = false;
+	pawn = false;
+	setRow(aRow);
+	setCol(aCol);
 }
 
 /** Description: return true if piece is white, else return false */
@@ -54,9 +57,31 @@ bool Piece::isKing() {
 	}
 }
 
+/** Description: return true if piece is a pawn, else return false */
+bool Piece::isPawn() {
+	if (pawn) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 /** Description: return the piece's symbol to print to board */
 char Piece::getSymbol() {
 	return symbol;
+}
+
+int Piece::getRow() {
+	return row;
+}
+
+int Piece::getCol() {
+	return col;
+}
+
+int Piece::getValue() {
+	return value;
 }
 
 /** Description: set a piece to white (false by default) and change its
@@ -71,24 +96,51 @@ void Piece::setDead() {
 	dead = true;
 }
 
+/** Description: set a piece to alive (false by default) */
+void Piece::setAlive() {
+	dead = false;
+}
+
 /** Description: set a piece to be a king (false by default) */
 void Piece::setKing() {
 	king = true;
+}
+
+/** Description: set a piece to be a pawn (false by default) */
+void Piece::setPawn() {
+	pawn = true;
 }
 
 void Piece::setSymbol(char aChar) {
 	symbol = aChar;
 }
 
+void Piece::setRow(int aRow) {
+	row = aRow;
+}
+
+void Piece::setCol(int aCol) {
+	col = aCol;
+}
+
+void Piece::setValue(int aVal) {
+	value = aVal;
+}
+
+void Piece::invertValue() {
+	value = value * -1;
+}
 
 /**********************************************************************************************
  ********************************* SECTION: Children of Piece *********************************
  **********************************************************************************************/
 
 /******************************************* Pawn *********************************************/
-Pawn::Pawn() {
+Pawn::Pawn(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('p');
 	setHasMoved(false);
+	setPawn();
+	setValue(10);
 }
 
 void Pawn::setHasMoved(bool aHasMoved) {
@@ -108,9 +160,9 @@ bool Pawn::validMove(Board* board, Square* start, Square* end) {
 	int col = start->getCol() - end->getCol();
 
 	/* If piece is black, flip row so a positive row still indicates forward
-	   movement of the piece */
+	   movement of the piece and negative indicates backwards */
 	if (!pawn->isWhite()) {
-		row = abs(row);
+		row = row * -1;
 	}
 
 	/* If piece does not move forward move is not valid */
@@ -169,24 +221,50 @@ bool Pawn::validMove(Board* board, Square* start, Square* end) {
 			return false;
 		}
 		else {
-			//Move was pawns 1st and spaces were empty, set hasMoved to true and return true
-			pawn->setHasMoved(true);
+			//Move was pawns 1st and spaces were empty, return true
 			return true;
 		}
 	}
 
-	/* If pawn's first move, update hasMoved before returning true */
-	if (!pawn->isHasMoved()) {
-		pawn->setHasMoved(true);
-	}
 	return true;
 }
 
+void Pawn::getPossibleMoves(int* rowArr, int* colArr, int& numMoves, Board* board) {
+	numMoves = 0;
+
+	//Add potential ending move spaces without considering other pieces on board
+	if (row < 7) {
+		//add fwd 1
+		rowArr[numMoves] = row + 1;
+		colArr[numMoves] = col;
+		numMoves++;
+		if (col != 0) {
+			//add diag left
+			rowArr[numMoves] = row + 1;
+			colArr[numMoves] = col - 1;
+			numMoves++;
+		}
+		if (col != 7) {
+			//add diag right
+			rowArr[numMoves] = row + 1;
+			colArr[numMoves] = col + 1;
+			numMoves++;
+		}
+		if (row < 6) {
+			//add fwd 2
+			rowArr[numMoves] = row + 2;
+			colArr[numMoves] = col;
+			numMoves++;
+		}
+	}
+
+}
 
 /******************************************* King *********************************************/
-King::King() {
+King::King(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('k');
 	setKing();
+	setValue(900);
 }
 
 bool King::validMove(Board* board, Square* start, Square* end) {
@@ -202,10 +280,63 @@ bool King::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void King::getPossibleMoves(int* rowArr, int* colArr, int& numMoves, Board* board) {
+	numMoves = 0;
+
+	if (row < 7) {
+		//add fwd 1
+		rowArr[numMoves] = row + 1;
+		colArr[numMoves] = col;
+		numMoves++;
+	}
+	if (row > 0) {
+		//add back 1
+		rowArr[numMoves] = row - 1;
+		colArr[numMoves] = col;
+		numMoves++;
+	}
+	if (col < 7) {
+		//add right 1
+		rowArr[numMoves] = row;
+		colArr[numMoves] = col + 1;
+		numMoves++;
+	}
+	if (col > 0) {
+		//add left 1
+		rowArr[numMoves] = row;
+		colArr[numMoves] = col - 1;
+		numMoves++;
+	}
+	if (col < 7 && row < 7) {
+		//add fwd right 1
+		rowArr[numMoves] = row + 1;
+		colArr[numMoves] = col + 1;
+		numMoves++;
+	}
+	if (col > 0 && row < 7) {
+		//add fwd left 1
+		rowArr[numMoves] = row + 1;
+		colArr[numMoves] = col - 1;
+		numMoves++;
+	}
+	if (col < 7 && row > 0) {
+		//add back right 1
+		rowArr[numMoves] = row - 1;
+		colArr[numMoves] = col + 1;
+		numMoves++;
+	}
+	if (col > 0 && row > 0) {
+		//add back left 1
+		rowArr[numMoves] = row - 1;
+		colArr[numMoves] = col - 1;
+		numMoves++;
+	}
+}
 
 /******************************************* Queen ********************************************/
-Queen::Queen() {
+Queen::Queen(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('q');
+	setValue(90);
 }
 
 bool Queen::validMove(Board* board, Square* start, Square* end) {
@@ -323,10 +454,201 @@ bool Queen::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void Queen::getPossibleMoves(int* rowArr, int* colArr, int& numMoves, Board* board) {
+	numMoves = 0;
+	int currRow = row;
+	int currCol = col;
+	Piece* tempPiece = nullptr;
+
+	//Look at moves fwd right until hitting your own piece or a second opponent
+	while (currCol < 7 && currRow < 7) {
+		currRow++; //Check the next space fwd right
+		currCol++;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves back left until hitting your own piece or a second opponent
+	while (currCol > 0 && currRow > 0) {
+		currRow--; //Check the next space back left
+		currCol--;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves fwd left until hitting your own piece or a second opponent
+	while (currCol > 0 && currRow < 7) {
+		currRow++; //Check the next space back left
+		currCol--;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves back right until hitting your own piece or a second opponent
+	while (currCol < 7 && currRow > 0) {
+		currRow--; //Check the next space back left
+		currCol++;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves forward until hitting your own piece or a second opponent
+	while (currRow < 7) {
+		currRow++; //Check the next space fwd
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves backwards until hitting your own piece or a second opponent
+	while (currRow > 0) {
+		currRow--; //Check the next space back
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves left until hitting your own piece or a second opponent
+	while (currCol > 0) {
+		currCol--; //Check the next space back
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves right until hitting your own piece or a second opponent
+	while (currCol < 7) {
+		currCol++; //Check the next space back
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+}
 
 /******************************************* Rook *********************************************/
-Rook::Rook() {
+Rook::Rook(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('r');
+	setValue(50);
 }
 
 bool Rook::validMove(Board* board, Square* start, Square* end) {
@@ -391,10 +713,105 @@ bool Rook::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void Rook::getPossibleMoves(int* rowArr, int* colArr, int& numMoves, Board* board) {
+	numMoves = 0;
+	int currRow = row;
+	int currCol = col;
+	Piece* tempPiece = nullptr;
+
+	//Look at moves forward until hitting your own piece or a second opponent
+	while (currRow < 7) {
+		currRow++; //Check the next space fwd
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves backwards until hitting your own piece or a second opponent
+	while (currRow > 0) {
+		currRow--; //Check the next space back
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves left until hitting your own piece or a second opponent
+	while (currCol > 0) {
+		currCol--; //Check the next space back
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves right until hitting your own piece or a second opponent
+	while (currCol < 7) {
+		currCol++; //Check the next space back
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+}
 
 /****************************************** Knight *********************************************/
-Knight::Knight() {
+Knight::Knight(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('n');
+	setValue(30);
 }
 
 bool Knight::validMove(Board* board, Square* start, Square* end) {
@@ -420,10 +837,39 @@ bool Knight::validMove(Board* board, Square* start, Square* end) {
 	return true;
 }
 
+void Knight::getPossibleMoves(int* rowArr, int* colArr, int& numMoves, Board* board) {
+	numMoves = 0;
+
+	if (col < 7 && row < 6) {
+		//add fwd right 1
+		rowArr[numMoves] = row + 2;
+		colArr[numMoves] = col + 1;
+		numMoves++;
+	}
+	if (col > 0 && row < 6) {
+		//add fwd left 1
+		rowArr[numMoves] = row + 2;
+		colArr[numMoves] = col - 1;
+		numMoves++;
+	}
+	if (col < 7 && row > 1) {
+		//add back right 1
+		rowArr[numMoves] = row - 2;
+		colArr[numMoves] = col + 1;
+		numMoves++;
+	}
+	if (col > 0 && row > 1) {
+		//add back left 1
+		rowArr[numMoves] = row - 2;
+		colArr[numMoves] = col - 1;
+		numMoves++;
+	}
+}
 
 /****************************************** Bishop ********************************************/
-Bishop::Bishop() {
+Bishop::Bishop(int aRow, int aCol) : Piece(aRow, aCol) {
 	setSymbol('b');
+	setValue(30);
 }
 
 bool Bishop::validMove(Board* board, Square* start, Square* end) {
@@ -491,4 +937,103 @@ bool Bishop::validMove(Board* board, Square* start, Square* end) {
 	}
 
 	return true;
+}
+
+void Bishop::getPossibleMoves(int* rowArr, int* colArr, int& numMoves, Board* board) {
+	numMoves = 0;
+	int currRow = row;
+	int currCol = col;
+	Piece* tempPiece = nullptr;
+
+	//Look at moves fwd right until hitting your own piece or a second opponent
+	while (currCol < 7 && currRow < 7) {
+		currRow++; //Check the next space fwd right
+		currCol++;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves back left until hitting your own piece or a second opponent
+	while (currCol > 0 && currRow > 0) {
+		currRow--; //Check the next space back left
+		currCol--;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves fwd left until hitting your own piece or a second opponent
+	while (currCol > 0 && currRow < 7) {
+		currRow++; //Check the next space back left
+		currCol--;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
+
+	//Reset currRow and currCol inbetween directional checks
+	currRow = row;
+	currCol = col;
+
+	//Look at moves back right until hitting your own piece or a second opponent
+	while (currCol < 7 && currRow > 0) {
+		currRow--; //Check the next space back left
+		currCol++;
+		tempPiece = board->getSquare(currRow, currCol)->getPiece();
+		if (tempPiece != nullptr) {
+			if (!tempPiece->isWhite()) {
+				break; //If you hit a black piece don't add move and then break
+			}
+		}
+		rowArr[numMoves] = currRow;
+		colArr[numMoves] = currCol;
+		numMoves++;
+		if (tempPiece != nullptr) {
+			if (tempPiece->isWhite()) {
+				break; //If you hit a white piece break after adding the move
+			}
+		}
+	}
 }
